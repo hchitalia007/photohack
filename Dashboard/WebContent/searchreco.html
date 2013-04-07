@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Music Search</title>
+		<script src="jquery-1.9.1.min.js"></script>
+		
+		<link rel="shortcut icon" href="search.jpg" type="image/type here" />
+	<link rel="stylesheet" type="text/css" media="screen" href="http://www-scf.usc.edu/~abanik/hw6/hw8.css" />	
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<link href='http://fonts.googleapis.com/css?family=Merienda' rel='stylesheet' type='text/css'>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="http://www-scf.usc.edu/~abanik/hw6/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    
+    <style type="text/css">
+    html { height: 100%; }
+    body { height: 100%; margin: 0; padding: 0; }
+    /* Give our markers a background image */
+    .leaflet-marker-icon {
+      background: url(https://foursquare.com/img/pin-blue-transparent.png);
+      padding: 6px;
+      padding-bottom: 17px;
+      top: -6px;
+      left: -6px;
+      }
+  </style>
+    
+	</head>
+	
+	<body>
+		
+	<div id="fb-root"></div>
+
+	<div id="searching">
+	<div id="searchingform">
+	<p>Please Enter Your request for music search: </p> 
+	
+		<input id="textform" type="text" value="" name="searchitem" placeholder="Enter by artist, album or songs"> <br> 
+		<span>
+			<select id="selector" name="arttype">
+				<option value="artists">Artists</option>
+				<option value="albums">Albums</option>
+				<option value="songs">Songs</option>
+			</select>
+		</span> 
+		<br> 
+		<button type="submit" class="btn btn-primary" id="buttoner">Submit</button>
+
+	</div>
+	
+	<table id="tabler" align=center  border="1" width="70%"></table>
+	
+	<div id="image"></div>
+	
+	<p id="nodata"></p>
+	
+	
+	</div>	
+	<script src="searchreco.js"></script>	
+	  <script type="text/javascript">
+  
+  var config = {
+    apiKey: 'KCZRGFSTAJCIMGPP1DOCFUKKQLTXUUHNPQ5ZPZZ33LGVZVJD',
+    authUrl: 'https://foursquare.com/',
+    apiUrl: 'https://api.foursquare.com/'
+  };
+  
+ 
+  //<![CDATA[
+  // Javascript will go here.
+  //]]>
+  </script>
+
+	<noscript>
+	</body>
+</html>
+
