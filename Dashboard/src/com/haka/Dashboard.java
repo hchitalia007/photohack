@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +34,6 @@ import com.restfb.json.JsonObject;
 /**
  * Servlet implementation class Dashboard
  */
-@WebServlet("/Dashboard")
 public class Dashboard extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -56,7 +56,7 @@ public class Dashboard extends HttpServlet {
 		response.setContentType("text/html");
 
 		FacebookClient facebookClient = new DefaultFacebookClient(
-				"AAACEdEose0cBAEGWchpW2xX8ACZAPE6uHNSnBKD9ypQTPJ7tZCJrcBhuO0K4LGpHQqEk0s360VYAuZAMqJH9PhiZBhLHFSIU8lBoITxwu6ayIfLI32n5");
+				"AAACEdEose0cBACpN1QhdWNW9FTHxBMyuOpiuRUtIyeGDHmOjty8ZA7b1sQag7hCEnjZCCm3ZBDOIniGX2xqgeBXYmd975VCZC5EKKsDsxMiZBs4n4cjMr");
 
 		String query = "SELECT pid,src_big FROM photo WHERE aid IN (SELECT aid FROM album WHERE owner=me())";
 		List<JsonObject> queryResults = facebookClient.executeFqlQuery(query,
@@ -64,46 +64,54 @@ public class Dashboard extends HttpServlet {
 
 		ServletContext cntx = getServletContext();
 
-		for (JsonObject jsonObj : queryResults) {
-			try
-			{
-			URL url = new URL(jsonObj.getString("src_big"));
-			InputStream in = new BufferedInputStream(url.openStream());
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			byte[] buf = new byte[1024];
-			int n = 0;
-			while (-1 != (n = in.read(buf))) {
-				out.write(buf, 0, n);
-			}
-			out.close();
-			in.close();
-			byte[] responseOut = out.toByteArray();
+		Iterator itr = queryResults.iterator();
 
-			FileOutputStream fos = new FileOutputStream(
-					cntx.getRealPath(jsonObj.getString("pid") + ".jpg"));
-			fos.write(responseOut);
-			fos.close();
+		while (itr.hasNext()) {
+			try {
+				JsonObject jsonObj = (JsonObject) itr.next();
+				URL url = new URL(jsonObj.getString("src_big"));
+				InputStream in = new BufferedInputStream(url.openStream());
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				byte[] buf = new byte[1024];
+				int n = 0;
+				while (-1 != (n = in.read(buf))) {
+					out.write(buf, 0, n);
+				}
+				out.close();
+				in.close();
+				byte[] responseOut = out.toByteArray();
 
-			HttpClient httpclient = new DefaultHttpClient();
-			HttpPost httppost = new HttpPost(
-					"https://autotags.iqengines.com/api/v0.1/photo/");
+				FileOutputStream fos = new FileOutputStream(
+						cntx.getRealPath(jsonObj.getString("pid") + ".jpg"));
+				fos.write(responseOut);
+				fos.close();
 
-			FileBody file = new FileBody(new File(cntx.getRealPath(jsonObj
-					.getString("pid")+ ".jpg")));
-			StringBody key = new StringBody("50baa58e64d34b9cb014fde01bf8758a");
+				HttpClient httpclient = new DefaultHttpClient();
+				HttpPost httppost = new HttpPost(
+						"https://autotags.iqengines.com/api/v0.1/photo/");
 
-			MultipartEntity reqEntity = new MultipartEntity();
-			reqEntity.addPart("file", file);
-			reqEntity.addPart("key", key);
-			httppost.setEntity(reqEntity);
+				FileBody file = new FileBody(new File(cntx.getRealPath(jsonObj
+						.getString("pid") + ".jpg")));
+				StringBody key = new StringBody(
+						"50baa58e64d34b9cb014fde01bf8758a");
 
-			HttpResponse response1 = httpclient.execute(httppost);
-			HttpEntity resEntity = response1.getEntity();
-			JsonObject job = new JsonObject(resEntity.getContent());
-			System.out.println("Yahoo....!"+job.getString("tags"));
-			
-			}catch(Exception e)
-			{
+				MultipartEntity reqEntity = new MultipartEntity();
+				reqEntity.addPart("file", file);
+				reqEntity.addPart("key", key);
+				httppost.setEntity(reqEntity);
+
+				HttpResponse response1 = httpclient.execute(httppost);
+				HttpEntity resEntity = response1.getEntity();
+
+				Scanner s = new Scanner(resEntity.getContent());
+				StringBuilder builder = new StringBuilder();
+				while (s.hasNextLine()) {
+					builder.append(s.nextLine() + "\n");
+				}
+
+				pw.write(builder.toString());
+
+			} catch (Exception e) {
 				System.out.println("Error");
 			}
 		}
